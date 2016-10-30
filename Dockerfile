@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Add sources for latest nginx
 # Install software requirements
 #
-ENV IMAGE_PHP_VERSION=7
+ENV IMAGE_PHP_VERSION=7.1
 RUN apt-get update && \
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
 apt-get install -y software-properties-common && \
@@ -21,7 +21,7 @@ add-apt-repository ppa:nginx/$nginx && \
 add-apt-repository ppa:ondrej/php && \
 apt-get update && \
 apt-get upgrade -y && \
-BUILD_PACKAGES="supervisor nginx php${IMAGE_PHP_VERSION}-fpm git php${IMAGE_PHP_VERSION}-mysql php-apc php${IMAGE_PHP_VERSION}-curl php${IMAGE_PHP_VERSION}-gd php${IMAGE_PHP_VERSION}-intl php${IMAGE_PHP_VERSION}-mcrypt php${IMAGE_PHP_VERSION}-memcache php${IMAGE_PHP_VERSION}-sqlite php${IMAGE_PHP_VERSION}-tidy php${IMAGE_PHP_VERSION}-xmlrpc php${IMAGE_PHP_VERSION}-xsl php${IMAGE_PHP_VERSION}-pgsql php${IMAGE_PHP_VERSION}-mongo php${IMAGE_PHP_VERSION}-ldap pwgen php${IMAGE_PHP_VERSION}-cli curl" && \
+BUILD_PACKAGES="supervisor nginx php${IMAGE_PHP_VERSION}-fpm git php${IMAGE_PHP_VERSION}-mysql php-apcu php${IMAGE_PHP_VERSION}-curl php${IMAGE_PHP_VERSION}-gd php${IMAGE_PHP_VERSION}-intl php${IMAGE_PHP_VERSION}-mcrypt php${IMAGE_PHP_VERSION}-memcache php${IMAGE_PHP_VERSION}-sqlite php${IMAGE_PHP_VERSION}-tidy php${IMAGE_PHP_VERSION}-xmlrpc php${IMAGE_PHP_VERSION}-xsl php${IMAGE_PHP_VERSION}-pgsql php${IMAGE_PHP_VERSION}-mongo php${IMAGE_PHP_VERSION}-ldap pwgen php${IMAGE_PHP_VERSION}-cli curl" && \
 apt-get -y install $BUILD_PACKAGES && \
 apt-get remove --purge -y software-properties-common && \
 apt-get autoremove -y && \
@@ -31,7 +31,7 @@ echo -n > /var/lib/apt/extended_states && \
 rm -rf /var/lib/apt/lists/* && \
 rm -rf /usr/share/man/?? && \
 rm -rf /usr/share/man/??_* && \
-curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # tweak nginx config
 RUN sed -i -e"s/worker_processes  1/worker_processes 5/" /etc/nginx/nginx.conf && \
