@@ -83,5 +83,4 @@ RUN chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Expose Ports
 EXPOSE 80
-
 CMD ["/bin/bash", "/cmd.sh"]
