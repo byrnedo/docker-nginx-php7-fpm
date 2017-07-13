@@ -27,4 +27,4 @@ chown -Rf www-data.www-data $NGINX_ROOT
 set -e
 
 # Start supervisord and services
-/usr/bin/supervisord -n -c /etc/supervisord.conf
+exec /usr/bin/supervisord -n -c /etc/supervisord.conf
