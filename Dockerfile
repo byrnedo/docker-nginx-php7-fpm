@@ -12,6 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Add sources for latest nginx
 # Install software requirements
 #
+ENV ERRORS=0
 ENV IMAGE_PHP_VERSION=7.1
 RUN apt-get update && \
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
