@@ -22,6 +22,7 @@ RUN apt-get update && \
     add-apt-repository ppa:nginx/$nginx && \
     LANG=C.UTF-8 add-apt-repository ppa:ondrej/php && \
     apt-get update && \
+    apt-get remove -y nginx-common && \
     apt-get upgrade -y && \
     apt-get -y install supervisor \
         nginx-extras \
