@@ -78,30 +78,19 @@ RUN sed -i -e "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/${IMAGE_PHP_
     find /etc/php/${IMAGE_PHP_VERSION}/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \; && \
     mkdir /run/php
 
-# mycrypt conf
-RUN phpenmod mcrypt
-
-# nginx site conf
-RUN rm -Rf /etc/nginx/conf.d/* && \
-rm -Rf /etc/nginx/sites-available/default && \
-mkdir -p /etc/nginx/ssl/
 
 COPY ./nginx.conf.tmpl /etc/nginx/sites-available/default.conf
-
-RUN rm -f /etc/nginx/sites-enabled/default
-
-RUN ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default
-
-# Supervisor Config
 COPY ./supervisord.conf /etc/supervisord.conf
-
-# Start Supervisord
 COPY ./cmd.sh /
-RUN chmod 755 /cmd.sh
-
-# add test PHP file
 COPY ./index.php /usr/share/nginx/html/index.php
-RUN chown -Rf www-data.www-data /usr/share/nginx/html/
+
+RUN phpenmod mcrypt && \
+    rm -Rf /etc/nginx/conf.d/* && \
+    mkdir -p /etc/nginx/ssl/ && \
+    rm -f /etc/nginx/sites-enabled/default && \
+    ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default && \
+    chmod 755 /cmd.sh && \
+    chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Expose Ports
 EXPOSE 80
