@@ -52,7 +52,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /usr/share/man/?? && \
     rm -rf /usr/share/man/??_* && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN mkdir /opt/lua && \
+    git clone https://github.com/knyar/nginx-lua-prometheus.git /tmp/lua-prom && \
+    cp /tmp/lua-prom/prometheus.lua /opt/lua/ && \
     nginx -v
 
 # tweak nginx config
@@ -79,7 +83,8 @@ RUN sed -i -e "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/${IMAGE_PHP_
     mkdir /run/php
 
 
-COPY ./nginx.conf.tmpl /etc/nginx/sites-available/default.conf
+COPY ./default.conf.tmpl /etc/nginx/sites-available/default.conf
+COPY ./metrics.conf /etc/nginx/sites-available/metrics.conf
 COPY ./supervisord.conf /etc/supervisord.conf
 COPY ./cmd.sh /
 COPY ./index.php /usr/share/nginx/html/index.php
@@ -89,9 +94,10 @@ RUN phpenmod mcrypt && \
     mkdir -p /etc/nginx/ssl/ && \
     rm -f /etc/nginx/sites-enabled/default && \
     ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default && \
+    ln -s /etc/nginx/sites-available/metrics.conf /etc/nginx/sites-enabled/metrics && \
     chmod 755 /cmd.sh && \
     chown -Rf www-data.www-data /usr/share/nginx/html/
 
 # Expose Ports
-EXPOSE 80
+EXPOSE 80 9000
 CMD ["/bin/bash", "/cmd.sh"]
