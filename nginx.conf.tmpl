@@ -21,6 +21,17 @@ server {
     # as directory, then fall back to index.html
     try_files $uri $uri/ /index.php?q=$uri&$args;
   }
+	location /nginx_status {
+		# Turn on nginx stats
+        stub_status on;
+
+        # I do not need logs for stats
+        access_log   off;
+
+   
+        # Send rest of the world to /dev/null #
+        allow all;
+   }
 
   #error_page 404 /404.html;
 
