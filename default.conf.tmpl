@@ -1,0 +1,92 @@
+server {
+  listen   80; ## listen for ipv4; this line is default and implied
+  listen   [::]:80 default ipv6only=on; ## listen for ipv6
+
+  root %%NGINX_ROOT%%;
+  index index.php index.html index.htm;
+
+  # Make site accessible from http://localhost/
+  #server_name localhost;
+  
+  # Disable sendfile as per https://docs.vagrantup.com/v2/synced-folders/virtualbox.html
+  sendfile off;
+
+  # Add stdout logging
+
+  error_log /dev/stdout info;
+  access_log /dev/stdout;
+
+  location / {
+    # First attempt to serve request as file, then
+    # as directory, then fall back to index.html
+    try_files $uri $uri/ /index.php?q=$uri&$args;
+  }
+	location /nginx_status {
+		# Turn on nginx stats
+        stub_status on;
+
+        # I do not need logs for stats
+        access_log   off;
+
+   
+        # Send rest of the world to /dev/null #
+        allow all;
+   }
+
+  #error_page 404 /404.html;
+
+  # redirect server error pages to the static page /50x.html
+  #
+  error_page 500 502 503 504 /50x.html;
+  location = /50x.html {
+    root %%NGINX_ROOT%%;
+  }
+
+  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  #
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass unix:/var/run/php/php%%IMAGE_PHP_VERSION%%-fpm.sock;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+    fastcgi_index index.php;
+    include fastcgi_params;
+  }
+
+  # No Access log and no not found log
+  location ~* \.(ogg|ogv|svgz|mp4|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|txt)$ {
+      expires max;
+      log_not_found off;
+      access_log off;
+      add_header Cache-Control public;
+      fastcgi_hide_header Set-Cookie;
+  }
+
+  # No Access Log but keep no found log
+  location ~* \.(css|js|htm|html)$ {
+      expires max;
+      log_not_found on;
+      access_log off;
+      add_header Cache-Control public;
+      fastcgi_hide_header Set-Cookie;
+  }
+
+  # Adds CORS
+  location ~* \.(eot|oft|svg|ttf|woff)$ {
+      add_header Access-Control-Allow-Origin *;
+      expires max;
+      log_not_found off;
+      access_log off;
+      add_header Cache-Control public;
+      fastcgi_hide_header Set-Cookie;
+  }
+
+  # deny access to . files, for security
+  #
+  location ~ /\. {
+        log_not_found off; 
+        deny all;
+  }
+
+}
