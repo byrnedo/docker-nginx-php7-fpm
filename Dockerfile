@@ -22,7 +22,6 @@ RUN apt-get update && \
     add-apt-repository ppa:nginx/$nginx && \
     LANG=C.UTF-8 add-apt-repository ppa:ondrej/php && \
     apt-get update && \
-    apt-get remove -y nginx-common && \
     apt-get upgrade -y && \
     apt-get -y install supervisor \
         nginx-extras \
@@ -49,6 +48,7 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean && \
     apt-get autoclean && \
+    update-alternatives --set php /usr/bin/php${IMAGE_PHP_VERSION} && \
     echo -n > /var/lib/apt/extended_states && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /usr/share/man/?? && \
